@@ -140,7 +140,7 @@ void interactiveShowData(void) {
 
                 if (Modes.interactive_rtl1090) { // RTL1090 display mode
                     if (trackDataValid(&a->altitude_valid)) {
-                        snprintf(strFl,6,"F%03d",((a->altitude+50)/100));
+//                        snprintf(strFl,6,"F%03d",((a->altitude+50)/100));
                     }
                     printf("%06x %-8s %-4s         %-3s %-3s %4s        %-6d  %-2.0f\n", 
                            a->addr, a->callsign, strFl, strGs, strTt, strSquawk, msgs, (now - a->seen)/1000.0);

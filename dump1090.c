@@ -53,6 +53,8 @@
 
 #include <stdarg.h>
 
+amqp_connection_state_t conn;
+
 static int verbose_device_search(char *s);
 
 //
@@ -168,7 +170,7 @@ void modesInit(void) {
 
     pthread_mutex_init(&Modes.data_mutex,NULL);
     pthread_cond_init(&Modes.data_cond,NULL);
-
+    
     Modes.sample_rate = 2400000.0;
 
     // Allocate the various buffers used by Modes
@@ -201,7 +203,7 @@ void modesInit(void) {
     } else if (Modes.fUserLon > 180.0) { // If Longitude is +180 to +360, make it -180 to 0
         Modes.fUserLon -= 360.0;
     }
-    // If both Lat and Lon are 0.0 then the users location is either invalid/not-set, or (s)he's in the 
+    // If both Lat and Lon are 0.0 then the users location is either invalid/not-set, or they're in the 
     // Atlantic ocean off the west coast of Africa. This is unlikely to be correct. 
     // Set the user LatLon valid flag only if either Lat or Lon are non zero. Note the Greenwich meridian 
     // is at 0.0 Lon,so we must check for either fLat or fLon being non zero not both. 
@@ -675,6 +677,13 @@ void showHelp(void) {
 "| dump1090 ModeS Receiver     %45s |\n"
 "-----------------------------------------------------------------------------\n"
 "--device-index <index>   Select RTL device (default: 0)\n"
+"--rabbit-enabled         Enable rabbit messages\n"
+"--rabbit-hostname        Set rabbit destination\n"
+"--rabbit-port            Set rabbit port\n"
+"--rabbit-exchange        Set rabbit exchange\n"
+"--rabbit-routingkey      Set rabbit routing key\n"
+"--rabbit-user            Set rabbit user\n"
+"--rabbit-password        Set rabbit password\n"
 "--gain <db>              Set gain (default: max gain. Use -10 for auto-gain)\n"
 "--enable-agc             Enable the Automatic Gain Control (default: off)\n"
 "--freq <hz>              Set frequency (default: 1090 Mhz)\n"
@@ -829,8 +838,24 @@ void backgroundTasks(void) {
         }
     }
 
-    if (Modes.json_dir && now >= next_json) {
-        writeJsonToFile("aircraft.json", generateAircraftJson);
+    if (now >= next_json) {
+        //here is where we will send the message
+        {
+    amqp_basic_properties_t props;
+    props._flags = AMQP_BASIC_CONTENT_TYPE_FLAG | AMQP_BASIC_DELIVERY_MODE_FLAG;
+    props.content_type = amqp_cstring_bytes("text/plain");
+    props.delivery_mode = 2; /* persistent delivery mode */
+    die_on_error(amqp_basic_publish(conn,
+                                    1,
+                                    amqp_cstring_bytes(Modes.rabbit_exchange),
+                                    amqp_cstring_bytes(Modes.rabbit_routingkey),
+                                    0,
+                                    0,
+                                    &props,
+                                    amqp_cstring_bytes(generateAircraftJson)),
+                 "Publishing");
+  }
+        //writeJsonToFile("aircraft.json", generateAircraftJson);
         next_json = now + Modes.json_interval;
     }
 
@@ -937,7 +962,40 @@ int main(int argc, char **argv) {
     // Parse the command line options
     for (j = 1; j < argc; j++) {
         int more = j+1 < argc; // There are more arguments
-
+        if (!strcmp(argv[j],"--rabbit-enable"))
+        {
+            Modes.rabbit_enabled = 1;
+        } else 
+        if (!strcmp(argv[j],"--rabbit-hostname"))
+        {
+            Modes.rabbit_hostname =argv[j];
+        } else 
+        if (!strcmp(argv[j],"--rabbit-port"))
+        {
+            Modes.rabbit_port = atoi(argv[j]);
+        } else 
+        
+        if (!strcmp(argv[j],"--rabbit-exchange"))
+        {
+            Modes.rabbit_exchange = argv[j];
+        } else 
+        
+        if (!strcmp(argv[j],"--rabbit-routingkey"))
+        {
+            Modes.rabbit_routingkey = argv[j];
+        } else 
+        
+        if (!strcmp(argv[j],"--rabbit-user"))
+        {
+            Modes.rabbit_user = argv[j];
+        } else 
+        
+        if (!strcmp(argv[j],"--rabbit-password"))
+        {
+            Modes.rabbit_password = argv[j];
+        } else 
+        
+        
         if (!strcmp(argv[j],"--device-index") && more) {
             Modes.dev_name = strdup(argv[++j]);
         } else if (!strcmp(argv[j],"--gain") && more) {
@@ -1129,7 +1187,15 @@ int main(int argc, char **argv) {
     // Setup for SIGWINCH for handling lines
     if (Modes.interactive) {signal(SIGWINCH, sigWinchCallback);}
 #endif
+    conn = amqp_new_connection();
 
+    amqp_socket_t *socket = amqp_ssl_socket_new(conn);
+
+    amqp_socket_open(socket, Modes.rabbit_hostname, Modes.rabbit_port); 
+    
+    amqp_login(conn, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN, Modes.rabbit_user, Modes.rabbit_password); 
+
+    amqp_channel_open(conn, 1);
     // Initialization
     log_with_timestamp("%s %s starting up.", MODES_DUMP1090_VARIANT, MODES_DUMP1090_VERSION);
     modesInit();

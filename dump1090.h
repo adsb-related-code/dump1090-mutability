@@ -46,7 +46,8 @@
 //   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 //   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 //   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+#include <amqp_ssl_socket.h>
+#include <amqp_framing.h>
 #ifndef __DUMP1090_H
 #define __DUMP1090_H
 
@@ -268,6 +269,14 @@ struct {                             // Internal state
 
     pthread_mutex_t data_mutex;      // Mutex to synchronize buffer access
     pthread_cond_t  data_cond;       // Conditional variable associated
+
+    int rabbit_enabled;  
+    char* rabbit_hostname;
+    int rabbit_port;
+    char* rabbit_exchange;
+    char* rabbit_routingkey;
+    char* rabbit_user;
+    char* rabbit_password;
 
     struct mag_buf  mag_buffers[MODES_MAG_BUFFERS];       // Converted magnitude buffers from RTL or file input
     unsigned        first_free_buffer;                    // Entry in mag_buffers that will next be filled with input.
