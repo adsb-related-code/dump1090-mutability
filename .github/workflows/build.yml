@@ -13,6 +13,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: prepare
       run: |
+        sudo apt-get install -y librtlsdr-dev
         mkdir rabbit_dependency
         cd rabbit_dependency
         git clone https://github.com/alanxz/rabbitmq-c 
