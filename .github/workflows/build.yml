@@ -19,8 +19,8 @@ jobs:
         cd rabbitmq-c
         mkdir build 
         cd build
-        cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
-        cmake --build . --target install
+        sudo cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
+        sudo cmake --build . --target install
     - name: make
       run: make
     - name: make check
