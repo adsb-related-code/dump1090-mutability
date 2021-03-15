@@ -12,7 +12,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: prepare
-      run: mkdir rabbit_dependency; git clone https://github.com/alanxz/rabbitmq-c ; mkdir build && cd build; cmake .. ; 
+      run: |
+        mkdir rabbit_dependency
+        cd rabbit_dependency
+        git clone https://github.com/alanxz/rabbitmq-c 
+        mkdir build 
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
+        cmake --build . [--config Release] --target install
     - name: make
       run: make
     - name: make check
