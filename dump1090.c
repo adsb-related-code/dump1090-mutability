@@ -48,8 +48,9 @@
 //   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "dump1090.h"
-
+#include "rabbitUtils.h"
 #include <rtl-sdr.h>
+#include <amqp_tcp_socket.h>
 
 #include <stdarg.h>
 
@@ -839,26 +840,13 @@ void backgroundTasks(void) {
     }
 
     if (now >= next_json) {
+       writeJsonToRabbit(conn,generateAircraftJson);
         //here is where we will send the message
-        {
-    amqp_basic_properties_t props;
-    props._flags = AMQP_BASIC_CONTENT_TYPE_FLAG | AMQP_BASIC_DELIVERY_MODE_FLAG;
-    props.content_type = amqp_cstring_bytes("text/plain");
-    props.delivery_mode = 2; /* persistent delivery mode */
-    die_on_error(amqp_basic_publish(conn,
-                                    1,
-                                    amqp_cstring_bytes(Modes.rabbit_exchange),
-                                    amqp_cstring_bytes(Modes.rabbit_routingkey),
-                                    0,
-                                    0,
-                                    &props,
-                                    amqp_cstring_bytes(generateAircraftJson)),
-                 "Publishing");
-  }
+    
         //writeJsonToFile("aircraft.json", generateAircraftJson);
         next_json = now + Modes.json_interval;
     }
-
+exit(1);
     if (now >= next_history) {
         int rewrite_receiver_json = (Modes.json_dir && Modes.json_aircraft_history[HISTORY_SIZE-1].content == NULL);
 
@@ -961,38 +949,45 @@ int main(int argc, char **argv) {
 
     // Parse the command line options
     for (j = 1; j < argc; j++) {
+        printf("%s\n",argv[j]);
         int more = j+1 < argc; // There are more arguments
-        if (!strcmp(argv[j],"--rabbit-enable"))
+        if (!strcmp(argv[j],"--rabbit-enable") && more)
         {
             Modes.rabbit_enabled = 1;
         } else 
-        if (!strcmp(argv[j],"--rabbit-hostname"))
+        if (!strcmp(argv[j],"--rabbit-hostname") && more)
         {
-            Modes.rabbit_hostname =argv[j];
+            printf("Read\n");
+            Modes.rabbit_hostname =strdup(argv[++j]);
+        printf("%s\n",argv[j]);
         } else 
-        if (!strcmp(argv[j],"--rabbit-port"))
+
+        if (!strcmp(argv[j],"--rabbit-port") && more)
         {
-            Modes.rabbit_port = atoi(argv[j]);
-        } else 
-        
-        if (!strcmp(argv[j],"--rabbit-exchange"))
-        {
-            Modes.rabbit_exchange = argv[j];
-        } else 
-        
-        if (!strcmp(argv[j],"--rabbit-routingkey"))
-        {
-            Modes.rabbit_routingkey = argv[j];
+            Modes.rabbit_port = atoi(argv[++j]);
+        printf("%s\n",argv[j]);
         } else 
         
-        if (!strcmp(argv[j],"--rabbit-user"))
+        if (!strcmp(argv[j],"--rabbit-exchange") && more)
         {
-            Modes.rabbit_user = argv[j];
+            Modes.rabbit_exchange = argv[++j];
+        printf("%s\n",argv[j]);
         } else 
         
-        if (!strcmp(argv[j],"--rabbit-password"))
+        if (!strcmp(argv[j],"--rabbit-routingkey") && more)
         {
-            Modes.rabbit_password = argv[j];
+            Modes.rabbit_routingkey = argv[++j];
+
+        } else 
+        
+        if (!strcmp(argv[j],"--rabbit-user") && more)
+        {
+            Modes.rabbit_user = argv[++j];
+        } else 
+        
+        if (!strcmp(argv[j],"--rabbit-password") && more)
+        {
+            Modes.rabbit_password = argv[++j];
         } else 
         
         
@@ -1187,15 +1182,24 @@ int main(int argc, char **argv) {
     // Setup for SIGWINCH for handling lines
     if (Modes.interactive) {signal(SIGWINCH, sigWinchCallback);}
 #endif
+    int status = 0;
     conn = amqp_new_connection();
+    amqp_socket_t *socket = amqp_tcp_socket_new(conn);
+    if (!socket) {
+        die("creating TCP socket");
+    }
 
-    amqp_socket_t *socket = amqp_ssl_socket_new(conn);
+    status = amqp_socket_open(socket, Modes.rabbit_hostname, Modes.rabbit_port);
+    if (status) {
+        die("opening TCP socket");
+    }
 
-    amqp_socket_open(socket, Modes.rabbit_hostname, Modes.rabbit_port); 
+     
     
-    amqp_login(conn, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN, Modes.rabbit_user, Modes.rabbit_password); 
+    die_on_amqp_error(amqp_login(conn, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN, Modes.rabbit_user, Modes.rabbit_password), "Logging in"); 
 
     amqp_channel_open(conn, 1);
+    amqp_get_rpc_reply(conn);
     // Initialization
     log_with_timestamp("%s %s starting up.", MODES_DUMP1090_VARIANT, MODES_DUMP1090_VERSION);
     modesInit();

@@ -19,7 +19,13 @@
 
 #ifndef DUMP1090_NETIO_H
 #define DUMP1090_NETIO_H
+#include <amqp_tcp_socket.h>
+#include <amqp.h>
+#include <amqp_framing.h>
+#include <amqp_ssl_socket.h>
+#include <amqp_framing.h>
 
+#include "rabbitUtils.h"
 // Describes a networking service (group of connections)
 
 struct aircraft;
@@ -82,5 +88,6 @@ char *generateStatsJson(const char *url_path, int *len);
 char *generateReceiverJson(const char *url_path, int *len);
 char *generateHistoryJson(const char *url_path, int *len);
 void writeJsonToFile(const char *file, char * (*generator) (const char *,int*));
+void writeJsonToRabbit(amqp_connection_state_t conn,char * (*generator) (const char *,int*)); 
 
 #endif

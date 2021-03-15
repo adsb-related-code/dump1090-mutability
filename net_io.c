@@ -53,7 +53,8 @@
 #include <inttypes.h>
 
 #include <assert.h>
-
+#include "net_io.h"
+#include "rabbitUtils.h"
 //
 // ============================= Networking =============================
 //
@@ -1293,7 +1294,35 @@ char *generateHistoryJson(const char *url_path, int *len)
     *len = Modes.json_aircraft_history[history_index].clen;
     return strdup(Modes.json_aircraft_history[history_index].content);
 }
+// TAGG make another one of these for rabbit
 
+void writeJsonToRabbit(amqp_connection_state_t conn,char * (*generator) (const char *,int*)) 
+{
+#ifndef _WIN32
+    int len = 0;
+    char *content;
+    const char * t = "abcde";
+    if (!Modes.rabbit_enabled)
+        return;
+    content = generator(t, &len);
+    printf("%s", content);
+    {
+    amqp_basic_properties_t props;
+    props._flags = AMQP_BASIC_CONTENT_TYPE_FLAG | AMQP_BASIC_DELIVERY_MODE_FLAG;
+    props.content_type = amqp_cstring_bytes("text/plain");
+    props.delivery_mode = 2; /* persistent delivery mode */
+    die_on_error(amqp_basic_publish(conn,
+                                    1,
+                                    amqp_cstring_bytes(Modes.rabbit_exchange),
+                                    amqp_cstring_bytes(Modes.rabbit_routingkey),
+                                    0,
+                                    0,
+                                    &props,
+                                    amqp_cstring_bytes("Frame")),"Sending");
+  }
+  printf("%s","Helllo");
+#endif
+}
 // Write JSON to file
 void writeJsonToFile(const char *file, char * (*generator) (const char *,int*))
 {
@@ -1514,7 +1543,7 @@ static int handleHTTPRequest(struct client *c, char *p) {
         "\r\n",
         statuscode, statusmsg,
         content_type,
-        keepalive ? "keep-alive" : "close",
+        keepalive ? "keep-alive" : "clos",
         clen);
 
     if (Modes.debug & MODES_DEBUG_NET) {
