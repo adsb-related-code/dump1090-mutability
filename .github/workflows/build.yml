@@ -20,7 +20,7 @@ jobs:
         mkdir build 
         cd build
         cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
-        cmake --build . [--config Release] --target install
+        cmake --build . --target install
     - name: make
       run: make
     - name: make check
