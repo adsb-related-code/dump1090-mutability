@@ -16,6 +16,7 @@ jobs:
         mkdir rabbit_dependency
         cd rabbit_dependency
         git clone https://github.com/alanxz/rabbitmq-c 
+        cd rabbitmq-c
         mkdir build 
         cd build
         cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
