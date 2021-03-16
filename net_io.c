@@ -48,13 +48,11 @@
 //   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "dump1090.h"
+#include "rabbitUtils.h"
 
 /* for PRIX64 */
 #include <inttypes.h>
-
 #include <assert.h>
-#include "net_io.h"
-#include "rabbitUtils.h"
 //
 // ============================= Networking =============================
 //
@@ -1305,7 +1303,6 @@ void writeJsonToRabbit(amqp_connection_state_t conn,char * (*generator) (const c
     if (!Modes.rabbit_enabled)
         return;
     content = generator(t, &len);
-    printf("%s", content);
     {
     amqp_basic_properties_t props;
     props._flags = AMQP_BASIC_CONTENT_TYPE_FLAG | AMQP_BASIC_DELIVERY_MODE_FLAG;
@@ -1318,9 +1315,8 @@ void writeJsonToRabbit(amqp_connection_state_t conn,char * (*generator) (const c
                                     0,
                                     0,
                                     &props,
-                                    amqp_cstring_bytes("Frame")),"Sending");
+                                    amqp_cstring_bytes(content)),"Sending");
   }
-  printf("%s","Helllo");
 #endif
 }
 // Write JSON to file

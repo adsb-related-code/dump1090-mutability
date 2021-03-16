@@ -45,10 +45,11 @@ endif
 
 all: dump1090 view1090
 
-
+net_io.o : net_io.c net_io.h rabbitUtils.h
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(EXTRACFLAGS) $(LIBS) -c $< -o $@ 
 
 %.o: %.c *.h
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(EXTRACFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(EXTRACFLAGS) $(LIBS) -c $< -o $@ 
 
 dump1090.o: CFLAGS += `pkg-config --cflags librtlsdr libusb-1.0`
 

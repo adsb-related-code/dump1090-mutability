@@ -846,7 +846,6 @@ void backgroundTasks(void) {
         //writeJsonToFile("aircraft.json", generateAircraftJson);
         next_json = now + Modes.json_interval;
     }
-exit(1);
     if (now >= next_history) {
         int rewrite_receiver_json = (Modes.json_dir && Modes.json_aircraft_history[HISTORY_SIZE-1].content == NULL);
 

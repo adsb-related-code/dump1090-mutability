@@ -251,6 +251,7 @@ typedef enum {
 #include "icao_filter.h"
 #include "convert.h"
 
+
 //======================== structure declarations =========================
 
 // Structure representing one magnitude buffer
