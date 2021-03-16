@@ -43,7 +43,7 @@ CFLAGS+= -DMISSING_NANOSLEEP
 COMPAT+= compat/clock_nanosleep/clock_nanosleep.o
 endif
 
-all: dump1090 view1090
+all: dump1090 
 
 net_io.o : net_io.c net_io.h rabbitUtils.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(EXTRACFLAGS) $(LIBS) -c $< -o $@ 
