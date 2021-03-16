@@ -24,7 +24,19 @@ jobs:
         sudo cmake --build . --target install
     - name: make
       run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+    - 
+      name: Docker Login
+      uses: docker/login-action@v1.8.0
+      with:
+        registry: docker.centurionx.net
+        username: ${{secrets.DOCKER_USERNAME}}
+        password: ${{secrets.DOCKER_PASSWORD}}
+    - 
+      name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: ./
+        file: ./Dockerfile
+        push: true
+        tags: |
+          docker.centurionx.net/plane-receiver
