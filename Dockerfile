@@ -12,6 +12,7 @@ RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
 WORKDIR /
 RUN git clone https://github.com/Joseph-Melberg/dump1090-mutability
 WORKDIR /dump1090-mutability
+RUN make clean
 RUN make
 
 
@@ -19,4 +20,3 @@ RUN make
 EXPOSE 30004
 
 ENTRYPOINT [ "./dump1090-mutability/dump1090 --net-only  --rabbit-enable --rabbit-hostname rabbit.centurionx.net --rabbit-port 5672 --rabbit-exchange Inter --rabbit-routingkey /plane --rabbit-user planey --rabbit-password mcplaneyface --write-json-every 1" ]
-(END)
