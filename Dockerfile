@@ -8,7 +8,7 @@ RUN cd rabbitmq-c && git checkout 23856b8cce06d0ed0a4e65f46bde27df409fe9f6
 RUN cd rabbitmq-c && mkdir build && cd build
 WORKDIR /rabbitmq-c/build
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
-
+RUN cmake --build . --target install
 
 WORKDIR /
 RUN git clone https://github.com/Joseph-Melberg/dump1090-mutability
