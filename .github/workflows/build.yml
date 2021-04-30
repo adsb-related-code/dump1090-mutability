@@ -16,7 +16,7 @@ jobs:
         sudo apt-get install -y librtlsdr-dev libusb-1.0-0-dev pkg-config debhelper
         mkdir rabbit_dependency
         cd rabbit_dependency
-        git clone https://github.com/alanxz/rabbitmq-c 
+        git clone https://github.com/Joseph-Melberg/rabbitmq-c
         cd rabbitmq-c
         mkdir build 
         cd build
