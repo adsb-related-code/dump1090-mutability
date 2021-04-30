@@ -16,8 +16,9 @@ WORKDIR /dump1090-mutability
 RUN make clean
 RUN make
 RUN export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu
-
+RUN chmod +x Start.sh
+WORKDIR /
 
 EXPOSE 30004
 
-ENTRYPOINT [ "export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu && ./dump1090 --net-only  --rabbit-enable --rabbit-hostname rabbit.centurionx.net --rabbit-port 5672 --rabbit-exchange Inter --rabbit-routingkey /plane --rabbit-user planey --rabbit-password mcplaneyface --write-json-every 1" ]
+ENTRYPOINT [ "./Start.sh" ]
