@@ -4,6 +4,7 @@ RUN apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt
 RUN apt-get install -y cmake git
 RUN apt-get install -y libssl-dev librtlsdr-dev libusb-1.0-0-dev pkg-config debhelper
 RUN git clone https://github.com/Joseph-Melberg/rabbitmq-c
+RUN cd rabbitmq-c && checkout 23856b8cce06d0ed0a4e65f46bde27df409fe9f6
 RUN cd rabbitmq-c && mkdir build && cd build
 WORKDIR /rabbitmq-c/build
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
