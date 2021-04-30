@@ -1,4 +1,4 @@
-FROM alpine
+FROM ubuntu
 
 COPY dump1090 dump1090
 
