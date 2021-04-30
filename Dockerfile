@@ -15,7 +15,7 @@ RUN git clone https://github.com/Joseph-Melberg/dump1090-mutability
 WORKDIR /dump1090-mutability
 RUN make clean
 RUN make
-
+RUN export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu
 
 
 EXPOSE 30004
