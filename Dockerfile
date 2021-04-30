@@ -17,8 +17,7 @@ RUN make clean
 RUN make
 RUN export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu
 RUN chmod +x Start.sh
-WORKDIR /
 
 EXPOSE 30004
 
-ENTRYPOINT [ "./Start.sh" ]
+ENTRYPOINT [ "./dump1090-mutability/Start.sh" ]
