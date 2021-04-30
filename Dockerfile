@@ -1,6 +1,6 @@
 FROM alpine
 
-COPY dump1090 /dump1090
+COPY dump1090 dump1090
 
 EXPOSE 30004
 
