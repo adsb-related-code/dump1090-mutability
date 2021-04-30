@@ -1,6 +1,6 @@
 FROM ubuntu
 
-COPY . .
+COPY dump1090 dump1090
 
 EXPOSE 30004
 
