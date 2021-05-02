@@ -23,7 +23,7 @@ CC=gcc
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
-LIBS+= -Bstatic -lrt, -Bstatic -lrabbitmq
+LIBS+= -lrt, -Bstatic -lrabbitmq
 CFLAGS+=-std=c11 -D_DEFAULT_SOURCE
 endif
 ifeq ($(UNAME), Darwin)
