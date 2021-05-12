@@ -20,4 +20,4 @@ RUN chmod +x Start.sh
 
 EXPOSE 30004
 
-ENTRYPOINT [ "./dump1090-mutability/Start.sh" ]
+ENTRYPOINT [ "/dump1090-mutability/Start.sh" ]
