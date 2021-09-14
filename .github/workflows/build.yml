@@ -31,7 +31,7 @@ jobs:
       name: Run SSH command
       uses: garygrossgarten/github-action-ssh@v0.5.0
       with:
-        command: ssh ${{secrets.INTER_INTERNAL_IP}} "docker pull docker.centurionx.net/plane-receiver; docker stop interplanereceiver; docker rm interplanereceiver; docker run -p 30004:30004 --log-driver none --name=interplanereceiver --restart=unless-stopped -d docker.centurionx.net/plane-receiver" 
+        command: ssh ${{secrets.INTER_INTERNAL_IP}} "docker pull docker.centurionx.net/plane-receiver; docker stop interplanereceiver; docker rm interplanereceiver; docker run -p 30004:30004 -p 8001:8080 --log-driver none --name=interplanereceiver --restart=unless-stopped -d docker.centurionx.net/plane-receiver" 
         host: ${{ secrets.HOST }}
         username: ${{secrets.CENTURION_USERNAME}}
         password: ${{secrets.CENTURION_PASSWORD}}
