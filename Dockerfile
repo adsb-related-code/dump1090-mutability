@@ -19,5 +19,6 @@ RUN export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu
 RUN chmod +x Start.sh
 
 EXPOSE 30004
+EXPOSE 8080
 
 ENTRYPOINT [ "/dump1090-mutability/Start.sh" ]
