@@ -278,6 +278,8 @@ struct {                             // Internal state
     char* rabbit_routingkey;
     char* rabbit_user;
     char* rabbit_password;
+    char* rabbit_source;
+    char* rabbit_antenna;
 
     struct mag_buf  mag_buffers[MODES_MAG_BUFFERS];       // Converted magnitude buffers from RTL or file input
     unsigned        first_free_buffer;                    // Entry in mag_buffers that will next be filled with input.

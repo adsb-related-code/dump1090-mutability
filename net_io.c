@@ -1020,9 +1020,13 @@ char *generateAircraftJson(const char *url_path, int *len) {
 
     p += snprintf(p, end-p,
                   "{ \"now\" : %.1f,\n"
+                  "  \"antenna\" : %s\n"
+                  "  \"source\" : %s\n"
                   "  \"messages\" : %u,\n"
                   "  \"aircraft\" : [",
                   now / 1000.0,
+                  Modes.rabbit_source,
+                  Modes.rabbit_antenna,
                   Modes.stats_current.messages_total + Modes.stats_alltime.messages_total);
 
     for (a = Modes.aircrafts; a; a = a->next) {

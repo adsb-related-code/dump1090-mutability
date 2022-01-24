@@ -685,6 +685,8 @@ void showHelp(void) {
 "--rabbit-routingkey      Set rabbit routing key\n"
 "--rabbit-user            Set rabbit user\n"
 "--rabbit-password        Set rabbit password\n"
+"--rabbit-source          Set signal source\n"
+"--rabbit-antenna         Set antenna name\n"
 "--gain <db>              Set gain (default: max gain. Use -10 for auto-gain)\n"
 "--enable-agc             Enable the Automatic Gain Control (default: off)\n"
 "--freq <hz>              Set frequency (default: 1090 Mhz)\n"
@@ -984,11 +986,20 @@ int main(int argc, char **argv) {
             Modes.rabbit_user = argv[++j];
         } else 
         
+        if (!strcmp(argv[j],"--rabbit-source") && more)
+        {
+            Modes.rabbit_source = argv[++j];
+        } else 
+        
+        if (!strcmp(argv[j],"--rabbit-antenna") && more)
+        {
+            Modes.rabbit_antenna = argv[++j];
+        } else 
+
         if (!strcmp(argv[j],"--rabbit-password") && more)
         {
             Modes.rabbit_password = argv[++j];
         } else 
-        
         
         if (!strcmp(argv[j],"--device-index") && more) {
             Modes.dev_name = strdup(argv[++j]);
